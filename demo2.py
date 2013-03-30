@@ -38,7 +38,7 @@ class App:
                         r=open("customerreview.txt",'a')
                         r.write(contents[i])
                         r.close()
-                        os.system("python aspect1.py")
+                        os.system("python test.py")
                         book = xlrd.open_workbook("Training datatemp.xls")
                         sh = book.sheet_by_name("crsheet")
                         tot=book.sheet_by_name("total")
