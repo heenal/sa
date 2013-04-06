@@ -9,20 +9,21 @@ from nltk.corpus import stopwords
 from nltk.stem.lancaster import LancasterStemmer
 st=LancasterStemmer()
 os.system("del \"Training datatemp.xls\"")
-
+os.system("del *.out")
+os.system("del *.test")
 os.system("del *.train")
 os.system("del *.model")
 
 """---open for reading---"""
-book = xlrd.open_workbook("Training data7.xls")
+book = xlrd.open_workbook("Training data8.xls")
 sh = book.sheet_by_name("train")
 
 """---open for writing---"""
 wbk=xlwt.Workbook()
 sheet=wbk.add_sheet("datatrain")
-wbk.save('Training datatemp.xls')
+wbk.save('Training datatemp1.xls')
 
-book1 = xlrd.open_workbook("Training datatemp.xls")
+book1 = xlrd.open_workbook("Training datatemp1.xls")
 sh1 = book1.sheet_by_name("datatrain")
 
 print sh.name, sh.nrows, sh.ncols
@@ -58,7 +59,7 @@ revaspectdict=dict()
 for kt,vt in aspectdict.iteritems():
     revaspectdict[int(vt)]=kt
 print revaspectdict
-
+ 
 adj='JJ'
 adv='RB'
 verb='VB'
@@ -71,7 +72,7 @@ featuredict=dict()
 frequency=dict()
 frequencyperaspect=[dict() for x in range(len(aspectdict))]
 
-for r in range(sh.nrows):
+for r in range(sh.nrows):                                                                               """---tokenize---"""
     aspectcount[aspectdict[sh.cell_value(r,1)]]=aspectcount[aspectdict[sh.cell_value(r,1)]]+1
     text=nltk.word_tokenize(sh.cell_value(r,2).lower())
     for t in text:
@@ -79,12 +80,12 @@ for r in range(sh.nrows):
             t=t[:-1]
     """print text"""
     tmp=text
-    text=nltk.pos_tag(text)
+    text=nltk.pos_tag(text)                                                                         """---POSTagging---"""
     """print text"""
     if 'not' in tmp or "n't" in tmp:
         flag=0
         for l in range(len(text)):
-            if "not"==text[l][0] or "n't"==text[l][0]:
+            if "not"==text[l][0] or "n't"==text[l][0]:                                              """---pre-pend not to next verb or adj---"""
                 flag=l+1
                 break
         for i in range(flag,len(text)):
@@ -96,12 +97,12 @@ for r in range(sh.nrows):
     for l in range(len(text)):
        if text[l][0] not in stopwords.words('english') and not (text[l][0]=='not') and not(text[l][0]=="n't"):
             """print text[l][0]"""
-            s=st.stem(text[l][0])
+            s=st.stem(text[l][0])                                                                   """---stemming---"""
             string=string+" "+s
             features.add(s)
             if s in frequency.keys():
                 frequency[s]+=1
-            else:
+            else:                                                                                  """---calculate Frequencies---"""
                 frequency[s]=1
             if s in frequencyperaspect[aspectdict[sh.cell_value(r,1)]].keys():
                 frequencyperaspect[aspectdict[sh.cell_value(r,1)]][s]+=1
@@ -112,9 +113,9 @@ for r in range(sh.nrows):
 
 """print features"""
 
-wbk.save('Training datatemp.xls')  
+wbk.save('Training datatemp1.xls')  
 
-book1 = xlrd.open_workbook("Training datatemp.xls")
+book1 = xlrd.open_workbook("Training datatemp1.xls")
 sh1 = book1.sheet_by_name("datatrain")
 
 print len(aspectdict)
@@ -123,7 +124,7 @@ print len(aspectdict)
 
 featureset=[set() for x in range(len(aspectdict))]
 
-keepset=[set() for x in range(len(aspectdict))]
+keepset=[set() for x in range(len(aspectdict))]                             """static set of words not to be removed from feature set---"""
 for r in  range(sh.nrows):
     asp=sh.cell_value(r,1)
     string=sh1.cell_value(r,0)
@@ -133,9 +134,11 @@ for r in  range(sh.nrows):
         """print string"""
         for i in range(len(string)):
             featureset[aspectdict[asp]].add(string[i])
+            if string[i]=='graph':
+                print asp
         """print featureset[aspectdict[asp]]"""
 
-book = xlrd.open_workbook("Training data7.xls")
+book = xlrd.open_workbook("Training data8.xls")
 keep = book.sheet_by_name("keep")
 for r in range(keep.nrows):
     asp=keep.cell_value(r,0)
@@ -149,7 +152,7 @@ for r in range(keep.nrows):
 """for r in range(len(featureset)):
     print len(featureset[r])"""
 
-aspectlexicon=[set() for x in range(len(aspectdict)*2)]
+aspectlexicon=[set() for x in range(len(aspectdict)*2)]                       
 for r in range (sh.nrows):
     pol=sh.cell_value(r,0)
     asp=sh.cell_value(r,1)
@@ -164,20 +167,17 @@ for r in range (sh.nrows):
             for i in range(len(string)):
                 aspectlexicon[aspectdict[asp]*2+1].add(string[i])
   
-toremove=set()
+toremove=set()                                                 """---features to be removed---"""
 for r in range(len(aspectdict)):
     for asp in featureset[r]:
-        if frequency[asp]<4 or frequency >30:
+        if frequency[asp]<4 or frequency[asp] >30:
             flag=0
             for rt in range(r+1, len(aspectdict)):
                 if asp in featureset[rt]:
                     toremove.add(asp)
 
 
-
 for asp in toremove:
-    if asp=='fragile':
-        print 'fragile'
     for r in range(len(aspectdict)):
         if asp in featureset[r]:
             if asp not in keepset[r]:
@@ -201,21 +201,11 @@ for asp in toremove:
         aspectlexicon[2*r].remove(asp)
         aspectlexicon[2*r+1].remove(asp)"""
 
-if 'camera' in aspectlexicon[16]:
-    print 'yes1'
-else:
-    print 'no1'
-if 'camera' in aspectlexicon[17]:
-    print 'yes2'
-else:
-    print 'no2'
 
 i=1;
 for r in range(len(aspectdict)):
     for asp in featureset[r]:
         featuredict[asp]=i
-        if i==4371:
-            print asp+"----"
         i+=1
 
 
@@ -258,7 +248,7 @@ for kt,vt in aspectdict.iteritems():
             lexicondict[vt][t]=i;
             i+=1;
 for r in range(sh.nrows):
-    name="C:\\Users\\KH\\Desktop\\BE Project 16-3\\libsvm-3.16\\windows\\"+sh.cell_value(r,1)+".train"
+    name="C:\\Users\\Fujitsu\\Desktop\\BE Project\\libsvm-3.16\\windows\\"+sh.cell_value(r,1)+".train"
     f=open(name, 'a')
     temp=set()
     string=sh1.cell_value(r,0)
@@ -277,28 +267,28 @@ for r in range(sh.nrows):
             else:
                 f.write("0 ")
     f.write("\n")        
-
+os.system("svm-train.exe -t 0 -q aspectdata.train")
 
 os.system("del *.pkl")
 
-output = open('aspectdict.pkl', 'wb')
-pickle.dump(aspectdict, output)
-output.close()
-output = open('lexicondict.pkl', 'wb')
-pickle.dump(lexicondict, output)
-output.close()
-output = open('aspectcount.pkl', 'wb')
-pickle.dump(aspectcount, output)
-output.close()
-output = open('featuredict.pkl', 'wb')
-pickle.dump(featuredict, output)
-output.close()
-output = open('revaspectdict.pkl', 'wb')
-pickle.dump(revaspectdict, output)
-output.close()
+output1 = open('aspectdict.pkl', 'wb')
+pickle.dump(aspectdict, output1)
+output1.close()
+output1 = open('revaspectdict.pkl', 'wb')
+pickle.dump(revaspectdict, output1)
+output1.close()
+output2 = open('lexicondict.pkl', 'wb')
+pickle.dump(lexicondict, output2)
+output2.close()
 
-
-os.system("svm-train.exe -t 0 aspectdata.train")
+output1 = open('featuredict.pkl', 'wb')
+pickle.dump(featuredict, output1)
+output1.close()
+output2 = open('aspectcount.pkl', 'wb')
+pickle.dump(aspectcount, output2)
+output2.close()
 
 for kt,vt in aspectdict.iteritems():
-    os.system("svm-train.exe -t 0 \""+kt+".train\"")
+    os.system("svm-train.exe -t 0 -q \""+kt+".train\"")
+
+

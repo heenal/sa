@@ -8,17 +8,20 @@ import time
 from nltk.corpus import stopwords
 from nltk.stem.lancaster import LancasterStemmer
 st=LancasterStemmer()
-
 os.system("del *.out")
 os.system("del *.test")
 
-"""--- For testing ---"""
+adv='RB'
+adj='JJ'
+verb='VB'
 
 wbk=xlwt.Workbook()
-featuredict=pickle.load(open('featuredict.pkl','r'))
-aspectdict=pickle.load(open('aspectdict.pkl','r'))
+
+"""--- For testing ---"""
 revaspectdict=pickle.load(open('revaspectdict.pkl','r'))
+aspectdict=pickle.load(open('aspectdict.pkl','r'))
 aspectcount=pickle.load(open('aspectcount.pkl','r'))
+featuredict=pickle.load(open('featuredict.pkl','r'))
 lexicondict=pickle.load(open('lexicondict.pkl','r'))
 
 sheet=wbk.add_sheet("datatest")
@@ -67,7 +70,7 @@ for r in range(sh.nrows):
     """print text"""
     tmp=text
     text=nltk.pos_tag(text)
-    """print text"""
+    print text
     if 'not' in tmp or "n't" in tmp:
         flag=0
         for l in range(len(text)):
@@ -205,15 +208,10 @@ book1 = xlrd.open_workbook("Training datatemp.xls")
 sh1 = book1.sheet_by_name("crsheet")
 print sh1.nrows
 
-if 'price' in lexicondict[4]:
-    print 'price hh'
-if 'camera' in lexicondict[8]:
-    print 'camera hh'
-if 'sound' in lexicondict[1]:
-    print 'sound hh'
+
 
 for r in range(sh1.nrows):
-    name="C:\\Users\\KH\\Desktop\\BE Project 16-3\\libsvm-3.16\\windows\\"+revaspectdict[int(sh1.cell_value(r,0))]+".test"
+    name="C:\\Users\\Fujitsu\\Desktop\\BE Project\\libsvm-3.16\\windows\\"+revaspectdict[int(sh1.cell_value(r,0))]+".test"
     f=open(name, 'a')
     temp=set()
     string=sh1.cell_value(r,1)

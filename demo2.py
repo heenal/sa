@@ -1,6 +1,7 @@
 from Tkinter import *
 from tkFileDialog import askopenfilename
 import os
+import pickle
 import xlrd
 class App:
 	def __init__(self,parent):
@@ -31,6 +32,7 @@ class App:
 		contents=self.text.get(1.0, END)
 		print contents
 		contents=contents.split("\n")
+		aspectcount=pickle.load(open('aspectcount.pkl','r'))
                 for i in range(len(contents)):
                         if contents[i]=='':
                                 continue
@@ -44,8 +46,21 @@ class App:
                         tot=book.sheet_by_name("total")
                         total=int(tot.cell_value(0,0))
                         ans=0
+                        aspectsfound=set()
+                        countdict=dict()
+                        for r in range(len(aspectcount)):
+                                countdict[r]=0
                         for r in range(sh.nrows):
-                                ans=ans+(int(sh.cell_value(r,2))*int(sh.cell_value(r,3)))
+                                aspectsfound.add(int(sh.cell_value(r,0)))
+                                countdict[int(sh.cell_value(r,0))]+=int(sh.cell_value(r,2))
+                        print countdict
+                        print aspectsfound
+                        for a in aspectsfound:
+                                if countdict[a]>1:
+                                        countdict[a]=1
+                                if countdict[a]<-1:
+                                        countdict[a]=-1
+                                ans=ans+(countdict[a]*aspectcount[a])
                         ans=ans*1.0
                         ans=ans/total
                         self.output.insert(END,ans)
@@ -56,6 +71,7 @@ class App:
                 print filename
                 r=open(filename,'r')
                 data=r.read()
+                print data
                 self.text.insert(END,data)
    		
 root = Tk()
