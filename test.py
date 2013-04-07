@@ -211,7 +211,7 @@ print sh1.nrows
 
 
 for r in range(sh1.nrows):
-    name="C:\\Users\\Fujitsu\\Desktop\\BE Project\\libsvm-3.16\\windows\\"+revaspectdict[int(sh1.cell_value(r,0))]+".test"
+    name="C:\\Users\\KH\\Desktop\\BE Project 16-3\\libsvm-3.16\\windows\\"+revaspectdict[int(sh1.cell_value(r,0))]+".test"
     f=open(name, 'a')
     temp=set()
     string=sh1.cell_value(r,1)

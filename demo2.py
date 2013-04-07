@@ -15,24 +15,27 @@ class App:
                 self.output=Text(f,height=5)
 		self.output.pack(side=BOTTOM)
 		
-		self.exit = Button(f, text="exit",command=f.quit)
+		self.exit = Button(f, text="Exit",command=f.quit)
 		self.exit.pack(side=BOTTOM,padx=10,pady=10)
 
-		self.upload=Button(f,text="upload",command=self.upload)
+		self.upload=Button(f,text="Upload",command=self.upload)
                 self.upload.pack(side=BOTTOM,padx=10,pady=10)
 
                 #self.entry = Entry(f,text="enter your choice")
 		#self.entry.pack(side= TOP,padx=10,pady=12)
 		
-		self.button = Button(f, text="submit",command=self.print_this)
+		self.button = Button(f, text="Submit",command=self.print_this)
 		self.button.pack(side=BOTTOM,padx=10,pady=10)
+
+		self.slider = Scale(length=700, cursor='plus', troughcolor='grey', sliderlength=20, width=7, orient='horizontal', showvalue=True, from_=-1, to=1, tickinterval=0.5, resolution=0.00000000001)
+                self.slider.pack(padx=12, pady=12)
 		
 	def print_this(self):
-		print "this is to be printed"
 		contents=self.text.get(1.0, END)
 		print contents
 		contents=contents.split("\n")
 		aspectcount=pickle.load(open('aspectcount.pkl','r'))
+		revaspectdict=pickle.load(open('revaspectdict.pkl','r'))
                 for i in range(len(contents)):
                         if contents[i]=='':
                                 continue
@@ -65,6 +68,23 @@ class App:
                         ans=ans/total
                         self.output.insert(END,ans)
                         self.output.insert(END,"\n")
+                        string=""
+                        self.output.tag_config("red", foreground='red')
+                        self.output.tag_config("green", foreground='DarkGreen')
+                        for a in aspectsfound:
+                                string=revaspectdict[a]
+                                if countdict[a]==1: 
+                                        self.output.insert(END,string, ("green"))
+                                        self.output.insert(END,"  ")
+                                elif countdict[a]==-1: 
+                                        self.output.insert(END,string, ("red"))
+                                        self.output.insert(END,"  ")
+                                else:
+                                        self.output.insert(END,string)
+                                        self.output.insert(END,"  ")
+                        
+                        self.output.insert(END,"\n")
+                        self.slider.set(ans)
 
         def upload(self):
                 filename = askopenfilename(filetypes=[("allfiles","*"),("pythonfiles","*.py")])

@@ -72,7 +72,7 @@ featuredict=dict()
 frequency=dict()
 frequencyperaspect=[dict() for x in range(len(aspectdict))]
 
-for r in range(sh.nrows):                                                                               """---tokenize---"""
+for r in range(sh.nrows):
     aspectcount[aspectdict[sh.cell_value(r,1)]]=aspectcount[aspectdict[sh.cell_value(r,1)]]+1
     text=nltk.word_tokenize(sh.cell_value(r,2).lower())
     for t in text:
@@ -80,12 +80,12 @@ for r in range(sh.nrows):                                                       
             t=t[:-1]
     """print text"""
     tmp=text
-    text=nltk.pos_tag(text)                                                                         """---POSTagging---"""
+    text=nltk.pos_tag(text)
     """print text"""
     if 'not' in tmp or "n't" in tmp:
         flag=0
         for l in range(len(text)):
-            if "not"==text[l][0] or "n't"==text[l][0]:                                              """---pre-pend not to next verb or adj---"""
+            if "not"==text[l][0] or "n't"==text[l][0]:
                 flag=l+1
                 break
         for i in range(flag,len(text)):
@@ -97,12 +97,12 @@ for r in range(sh.nrows):                                                       
     for l in range(len(text)):
        if text[l][0] not in stopwords.words('english') and not (text[l][0]=='not') and not(text[l][0]=="n't"):
             """print text[l][0]"""
-            s=st.stem(text[l][0])                                                                   """---stemming---"""
+            s=st.stem(text[l][0])
             string=string+" "+s
             features.add(s)
             if s in frequency.keys():
                 frequency[s]+=1
-            else:                                                                                  """---calculate Frequencies---"""
+            else:
                 frequency[s]=1
             if s in frequencyperaspect[aspectdict[sh.cell_value(r,1)]].keys():
                 frequencyperaspect[aspectdict[sh.cell_value(r,1)]][s]+=1
@@ -124,7 +124,7 @@ print len(aspectdict)
 
 featureset=[set() for x in range(len(aspectdict))]
 
-keepset=[set() for x in range(len(aspectdict))]                             """static set of words not to be removed from feature set---"""
+keepset=[set() for x in range(len(aspectdict))]
 for r in  range(sh.nrows):
     asp=sh.cell_value(r,1)
     string=sh1.cell_value(r,0)
@@ -167,7 +167,7 @@ for r in range (sh.nrows):
             for i in range(len(string)):
                 aspectlexicon[aspectdict[asp]*2+1].add(string[i])
   
-toremove=set()                                                 """---features to be removed---"""
+toremove=set()
 for r in range(len(aspectdict)):
     for asp in featureset[r]:
         if frequency[asp]<4 or frequency[asp] >30:
@@ -248,7 +248,7 @@ for kt,vt in aspectdict.iteritems():
             lexicondict[vt][t]=i;
             i+=1;
 for r in range(sh.nrows):
-    name="C:\\Users\\Fujitsu\\Desktop\\BE Project\\libsvm-3.16\\windows\\"+sh.cell_value(r,1)+".train"
+    name="C:\\Users\\KH\\Desktop\\BE Project 16-3\\libsvm-3.16\\windows\\"+sh.cell_value(r,1)+".train"
     f=open(name, 'a')
     temp=set()
     string=sh1.cell_value(r,0)
