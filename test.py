@@ -130,8 +130,6 @@ f=open("aspectdata.test",'r')
 f.read()
 f.close()
 
-os.system("echo 'heenal'")
-
 os.system("svm-predict.exe aspectdata.test aspectdata.train.model aspect.out")
 
 """---copy the output of aspect classification to datatest column 1---"""
