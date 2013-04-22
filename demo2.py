@@ -15,27 +15,30 @@ class App:
                 self.output=Text(f,height=5)
 		self.output.pack(side=BOTTOM)
 		
-		self.exit = Button(f, text="Exit",command=f.quit)
-		self.exit.pack(side=BOTTOM,padx=10,pady=10)
+		self.bclear= Button(f, text="Clear",command=self.clear)
+		self.bclear.pack(side=BOTTOM,padx=10,pady=10)
 
 		self.upload=Button(f,text="Upload",command=self.upload)
                 self.upload.pack(side=BOTTOM,padx=10,pady=10)
-
-                #self.entry = Entry(f,text="enter your choice")
-		#self.entry.pack(side= TOP,padx=10,pady=12)
 		
 		self.button = Button(f, text="Submit",command=self.print_this)
 		self.button.pack(side=BOTTOM,padx=10,pady=10)
 
 		self.slider = Scale(length=700, cursor='plus', troughcolor='grey', sliderlength=20, width=7, orient='horizontal', showvalue=True, from_=-1, to=1, tickinterval=0.5, resolution=0.00000000001)
                 self.slider.pack(padx=12, pady=12)
-		
+
+	def clear(self):
+                self.text.delete(0.0,END)
+                self.output.delete(0.0,END)
+                self.slider.set(0)
 	def print_this(self):
 		contents=self.text.get(1.0, END)
 		print contents
 		contents=contents.split("\n")
 		aspectcount=pickle.load(open('aspectcount.pkl','r'))
 		revaspectdict=pickle.load(open('revaspectdict.pkl','r'))
+		avgans=0
+		totr=0
                 for i in range(len(contents)):
                         if contents[i]=='':
                                 continue
@@ -84,7 +87,10 @@ class App:
                                         self.output.insert(END,"  ")
                         
                         self.output.insert(END,"\n")
-                        self.slider.set(ans)
+                        avgans=avgans+ans
+                        totr=totr+1
+                avgans=avgans/totr     
+                self.slider.set(avgans)
 
         def upload(self):
                 filename = askopenfilename(filetypes=[("allfiles","*"),("pythonfiles","*.py")])
